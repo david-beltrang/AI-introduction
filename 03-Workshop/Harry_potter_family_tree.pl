@@ -1,3 +1,7 @@
+%_____________________________________________________________________________________
+%------------------------------ HECHOS -----------------------------------------------
+%-------------------------------------------------------------------------------------
+
 % ==========================================
 % RELACIONES PATERNAS (es_padre)
 % ==========================================
@@ -183,8 +187,17 @@ es_madre(petunia_dursley, dudley_dursley).
 
 
 % ==========================================
-% PAREJAS
+% HERMANO (es_hermano)
 % ==========================================
+
+es_hermano(lily_potter, petunia_dursley).
+es_hermano(petunia_dursley,lily_potter).
+
+
+% ==========================================
+% PAREJAS (es_pareja)
+% ==========================================
+
 es_pareja(phineas_nigellus_black, ursula_flint).
 es_pareja(cygnus_black_sr, violetta_bulstrode).
 es_pareja(sirius_black_sr, hester_gamp).
@@ -208,7 +221,11 @@ es_pareja(james_potter, lily_potter).
 es_pareja(evan_dursley, petunia_dursley).
 es_pareja(tom_marvolo_riddle, bellatrix_lestrange).
 
-% Pureza de Sangre
+
+% ==========================================
+% PUREZA EN SANGRE (sangre_pura)
+% ==========================================
+
 sangre_pura(phineas_nigellus_black).
 sangre_pura(ursula_flint).
 sangre_pura(rodolphus_lestrange).
@@ -224,6 +241,12 @@ sangre_pura(septimus_weasley).
 sangre_pura(molly_weasley).
 sangre_pura(euphemia_potter).
 sangre_pura(fleamont_potter).
+
+
+% ============================================
+% FAMILIARES DE MUGGLES (familia_de_muggles)
+% ============================================
+
 familia_de_muggles(lily_potter).
 familia_de_muggles(petunia_dursley).
 familia_de_muggles(evan_dursley).
@@ -232,24 +255,66 @@ familia_de_muggles(ted_tonks).
 familia_de_muggles(tom_marvolo_riddle).
 familia_de_muggles(hermione_granger).
 
-% Familia Directa
-son_pareja(B,A):- es_pareja(A,B);es_pareja(B,A).
+
+%_____________________________________________________________________________________
+%------------------------------ REGLAS -----------------------------------------------
+%-------------------------------------------------------------------------------------
+
+
+% ==========================================
+% NIVEL 1: FAMILIA NUCLEAR
+% ==========================================
+
+% Se creó la regla de es_padre y es_madre para la pureza y se verifique por ambos padres
+padre(P, H) :- es_padre(P, H).
+madre(M, H) :- es_madre(M, H).
+
 es_hijo(B,A):- es_padre(A,B);es_madre(A,B).
+es_hermano(A,B) :- padre(P,A), padre(P,B), madre(M,A), madre(M,B), A \= B.
+
+% Aplica para consultar independiente del orden en que se haya puesto el Hecho
 progenitor(B,A):- es_padre(B,A);es_madre(B,A).
-es_hermano(lily_potter, petunia_dursley).
-es_hermano(petunia_dursley,lily_potter).
-es_hermano(B,C):- progenitor(A,B), progenitor(A,C), B\= C.
-es_tio(C,A):- es_hermano(B,C), progenitor(B,A).
-es_sobrino(A,C):- es_tio(C,A).
-es_primo(A,B):- es_tio(C,A), progenitor(C,B).
+son_pareja(B,A):- es_pareja(A,B);es_pareja(B,A).
+
+
+% ==========================================
+% NIVEL 2: FAMILIA CERCANA
+% ==========================================
+
 es_abuelo(A,C) :- progenitor(A,B), progenitor(B,C).
+
+% Caso Base
+es_descendiente(A, B) :- es_hijo(A, B).
+% Recursividad
+es_descendiente(A, B) :- es_hijo(A, C), es_descendiente(C, B).
+
+
+% ==========================================
+% NIVEL 3: RELACIONES GENERACIONALES
+% ==========================================
+
 es_bisabuelo(A,D) :- progenitor(A,B), progenitor(B,C), progenitor(C,D).
 es_tatarabuelo(A,E) :- progenitor(A,B), progenitor(B,C), progenitor(C,D), progenitor(D,E).
 es_trastatarabuelo(A,F) :- progenitor(A,B), progenitor(B,C), progenitor(C,D), progenitor(D,E), progenitor(E,F).
+
+% Caso Base
 es_ancestro(A, B) :- progenitor(A, B).
+% Caso Recursivo
 es_ancestro(A, B) :- progenitor(A, C), es_ancestro(C, B).
-es_descendiente(A, B) :- es_hijo(A, B).
-es_descendiente(A, B) :- es_hijo(A, C), es_descendiente(C, B).
+
+
+% ==========================================
+% NIVEL 4: RELACIONES LATERALES
+% ==========================================
+
+es_tio(A,B):- es_hermano(C,A), progenitor(C,B).
+es_sobrino(A,C):- es_tio(C,A).
+es_primo(A,B) :- progenitor(C,A), progenitor(D,B), es_hermano(C,D), A \= B.
+
+
+% ==========================================
+% NIVEL 5: RELACIONES EXTENDIDAS
+% ==========================================
 
 es_sobrino_nieto(A,B):- es_tio(B,C), progenitor(C,A).
 es_sobrino_bisnieto(A,B):- es_tio(B,C), es_abuelo(C,A).
@@ -268,12 +333,57 @@ es_tio_abuelo_tercero(A,B):- es_abuelo(C,A), es_tio_tatarabuelo(C,B).
 es_tio_cuarto(A,B):- es_bisabuelo(C,A), es_tio_tatarabuelo(C,B).
 es_primo_cuarto(A,B):- es_tatarabuelo(C,A), es_tio_tatarabuelo(C,B).
 
-es_pariente(A,B) :- es_ancestro(C,A), es_ancestro(C,B).
 
-%Familia Politica
+% ==========================================
+% NIVEL 6: FAMILIA POLITICA
+% ==========================================
+
 es_cunado(A,B) :- (son_pareja(A,C),es_hermano(C,B));(es_hermano(A,C),son_pareja(C,B)).
 es_suegro(A,B) :- progenitor(A,C),son_pareja(C,B).
 
 
-es_sangre_pura(A) :- sangre_pura(A),\+ familia_de_muggles(A).
-es_sangre_pura(A) :- \+ familia_de_muggles(A), (progenitor(B,A), es_sangre_pura(B)).
+% ==========================================
+% NIVEL 7: PARENTESCO GENERAL
+% ==========================================
+
+es_pariente(A,B) :- es_ancestro(C,A), es_ancestro(C,B).
+
+
+% ==========================================
+% NIVEL 8: CLASIFICACION DE SANGRE
+% ==========================================
+
+% --- CASO BASE ---
+% Segun la filosofia de Harry P, una persona es pura si sus padres son puros, y si esta persona no es de familia muggle
+%- Se usa el ! para que prolog no explore mas opciones y evitar un backtraking innecesario
+es_sangre_pura(A) :- 
+    sangre_pura(A), 
+    !. 
+
+es_sangre_pura(A) :-
+    \+ familia_de_muggles(A),
+    padre(P, A), es_sangre_pura(P),
+    madre(M, A), es_sangre_pura(M),
+    !. % se usa el operador de corte para que prolog pare si se comprobaron ambos lados
+
+
+% ==========================================
+% NIVEL 9: NIVEL DE SANGRE (CONSULTAS)
+% ==========================================
+
+% Caso es puro:
+nivel_sangre(A, pura) :- 
+    es_sangre_pura(A), 
+    !.
+
+% Caso muggle:
+nivel_sangre(A, muggle) :- 
+    familia_de_muggles(A), 
+    !.
+
+% Caso mestizo
+nivel_sangre(A, mestiza) :- 
+    % Tiene al menos un ancestro magico
+    (es_ancestro(Anc, A), sangre_pura(Anc)), 
+    % Y no es ni muggle ni puramente mago
+    !.
