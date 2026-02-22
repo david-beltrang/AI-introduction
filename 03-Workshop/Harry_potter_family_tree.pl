@@ -1,3 +1,7 @@
+% ==========================================
+% RELACIONES PATERNAS (es_padre)
+% ==========================================
+
 % Hijos de Phineas Nigellus Black
 es_padre(phineas_nigellus_black, sirius_black_sr).
 es_padre(phineas_nigellus_black, phineas_black).
@@ -27,9 +31,9 @@ es_padre(pollux_black, walburga_black).
 es_padre(pollux_black, cygnus_black).
 
 % Hijos de Cygnus Black
-es_padre(cygnus_black, bellatrix_black).
-es_padre(cygnus_black, andromeda_black).
-es_padre(cygnus_black, narcisa_black).
+es_padre(cygnus_black, bellatrix_lestrange).
+es_padre(cygnus_black, andromeda_tonks).
+es_padre(cygnus_black, narcisa_malfoy).
 
 % Hijos de Arcturus Black II
 es_padre(arcturus_black_ii, orion_black).
@@ -39,8 +43,8 @@ es_padre(arcturus_black_ii, lucretia_black).
 es_padre(orion_black, sirius_black).
 es_padre(orion_black, regulus_black).
 
-% Hijos de Rodolphus Lestrange
-es_padre(rodolphus_lestrange, delphini_riddle). % con Bellatrix
+% Hijos de Voldemort
+es_padre(tom_marvolo_riddle, delphini_riddle). % con Bellatrix
 
 % Hijos de Lucius Malfoy
 es_padre(lucius_malfoy, draco_malfoy).
@@ -76,7 +80,6 @@ es_padre(fleamont_potter, james_potter).
 
 % Hijos de James Potter
 es_padre(james_potter, harry_potter).
-es_padre(james_potter, ginny_weasley). % no, error - ver abajo
 
 % Hijos de Harry Potter
 es_padre(harry_potter, james_sirius_potter).
@@ -86,8 +89,6 @@ es_padre(harry_potter, lily_luna_potter).
 % Hijos de Evan Dursley
 es_padre(evan_dursley, dudley_dursley).
 
-% Hijos de Ignatius Prewett
-es_padre(ignatius_prewett, molly_weasley). % Molly es hija de Ignatius y Lucretia
 
 % ==========================================
 % RELACIONES MATERNAS (es_madre)
@@ -122,9 +123,9 @@ es_madre(irma_crabbe, walburga_black).
 es_madre(irma_crabbe, cygnus_black).
 
 % Hijos de Druella Rosier
-es_madre(druella_rosier, bellatrix_black).
-es_madre(druella_rosier, andromeda_black).
-es_madre(druella_rosier, narcisa_black).
+es_madre(druella_rosier, bellatrix_lestrange).
+es_madre(druella_rosier, andromeda_tonks).
+es_madre(druella_rosier, narcisa_malfoy).
 
 % Hijos de Melania_macmillan
 es_madre(melania_macmillan, orion_black).
@@ -171,7 +172,6 @@ es_madre(euphemia_potter, james_potter).
 
 % Hijos de Lily Potter
 es_madre(lily_potter, harry_potter).
-es_madre(lily_potter, james_sirius_potter). 
 
 % Hijos de Ginny Weasley
 es_madre(ginny_weasley, james_sirius_potter).
@@ -181,8 +181,6 @@ es_madre(ginny_weasley, lily_luna_potter).
 % Hijos de Petunia Dursley
 es_madre(petunia_dursley, dudley_dursley).
 
-% Hijos de Lucretia Black
-es_madre(lucretia_black, molly_weasley).
 
 % ==========================================
 % PAREJAS
@@ -208,18 +206,74 @@ es_pareja(harry_potter, ginny_weasley).
 es_pareja(fleamont_potter, euphemia_potter).
 es_pareja(james_potter, lily_potter).
 es_pareja(evan_dursley, petunia_dursley).
-es_pareja(tom_marvolo_riddle, bellatrix_lestrange). 
+es_pareja(tom_marvolo_riddle, bellatrix_lestrange).
 
-es_pareja(B,A):- es_pareja(A,B).
-es_hijo(B,A):- es_padre(A,B).
-es_hermano(B,C):- es_padre(A,B), es_padre(A,C), B\= C.
-es_tio(C,A):- es_hermano(B,C), es_padre(B,A).
+% Pureza de Sangre
+sangre_pura(phineas_nigellus_black).
+sangre_pura(ursula_flint).
+sangre_pura(rodolphus_lestrange).
+sangre_pura(druella_rosier).
+sangre_pura(lucius_malfoy).
+sangre_pura(irma_crabbe).
+sangre_pura(violetta_bulstrode).
+sangre_pura(hester_gamp).
+sangre_pura(melania_macmillan).
+sangre_pura(ignatius_prewett).
+sangre_pura(lysandra_yaxley).
+sangre_pura(septimus_weasley).
+sangre_pura(molly_weasley).
+sangre_pura(euphemia_potter).
+sangre_pura(fleamont_potter).
+familia_de_muggles(lily_potter).
+familia_de_muggles(petunia_dursley).
+familia_de_muggles(evan_dursley).
+familia_de_muggles(fleur_delacour).
+familia_de_muggles(ted_tonks).
+familia_de_muggles(tom_marvolo_riddle).
+familia_de_muggles(hermione_granger).
+
+% Familia Directa
+son_pareja(B,A):- es_pareja(A,B);es_pareja(B,A).
+es_hijo(B,A):- es_padre(A,B);es_madre(A,B).
+progenitor(B,A):- es_padre(B,A);es_madre(B,A).
+es_hermano(lily_potter, petunia_dursley).
+es_hermano(petunia_dursley,lily_potter).
+es_hermano(B,C):- progenitor(A,B), progenitor(A,C), B\= C.
+es_tio(C,A):- es_hermano(B,C), progenitor(B,A).
 es_sobrino(A,C):- es_tio(C,A).
-es_primo(A,B):- es_tio(C,A), es_padre(C,B).
-es_abuelo(A,C):- es_padre(A,B), es_padre(B,C).
-es_bisabuelo(A,D):- es_padre(A,B), es_padre(B,C) es_padre(C,D).
-es_tatarabuelo(A,F). es_padre(A,B), es_padre(B,C) es_padre(C,D), es_padre(E,F).
-es_ancestro(A, B) :- es_padre(A, B).
-es_ancestro(A, B) :- es_padre(A, C), es_ancestro(C, B).
+es_primo(A,B):- es_tio(C,A), progenitor(C,B).
+es_abuelo(A,C) :- progenitor(A,B), progenitor(B,C).
+es_bisabuelo(A,D) :- progenitor(A,B), progenitor(B,C), progenitor(C,D).
+es_tatarabuelo(A,E) :- progenitor(A,B), progenitor(B,C), progenitor(C,D), progenitor(D,E).
+es_trastatarabuelo(A,F) :- progenitor(A,B), progenitor(B,C), progenitor(C,D), progenitor(D,E), progenitor(E,F).
+es_ancestro(A, B) :- progenitor(A, B).
+es_ancestro(A, B) :- progenitor(A, C), es_ancestro(C, B).
 es_descendiente(A, B) :- es_hijo(A, B).
 es_descendiente(A, B) :- es_hijo(A, C), es_descendiente(C, B).
+
+es_sobrino_nieto(A,B):- es_tio(B,C), progenitor(C,A).
+es_sobrino_bisnieto(A,B):- es_tio(B,C), es_abuelo(C,A).
+es_sobrino_segundo(A,B):- es_primo(B,C), progenitor(C,A).
+es_sobrino_nieto_segundo(A,B):-es_primo(B,C), es_abuelo(C,A).
+es_tio_abuelo(A,B):- es_hermano(A,C), es_abuelo(C,B).
+es_tio_segundo(A,B):- progenitor(C,A), es_tio_abuelo(C,B).
+es_primo_segundo(A,B):- es_abuelo(C,A), es_tio_abuelo(C,B).
+es_tio_bisabuelo(A,B):- es_hermano(A,C), es_bisabuelo(C,B).
+es_tio_abuelo_segundo(A,B):- progenitor(C,A), es_tio_bisabuelo(C,B).
+es_tio_tercero(A,B):- es_abuelo(C,A), es_tio_bisabuelo(C,B).
+es_primo_tercero(A,B):- es_bisabuelo(C,A), es_tio_bisabuelo(C,B).
+es_tio_tatarabuelo(A,B):- es_hermano(A,C), es_tatarabuelo(C,B).
+es_tio_bisabuelo_segundo(A,B):- progenitor(C,A), es_tio_tatarabuelo(C,B).
+es_tio_abuelo_tercero(A,B):- es_abuelo(C,A), es_tio_tatarabuelo(C,B).
+es_tio_cuarto(A,B):- es_bisabuelo(C,A), es_tio_tatarabuelo(C,B).
+es_primo_cuarto(A,B):- es_tatarabuelo(C,A), es_tio_tatarabuelo(C,B).
+
+es_pariente(A,B) :- es_ancestro(C,A), es_ancestro(C,B).
+
+%Familia Politica
+es_cunado(A,B) :- (son_pareja(A,C),es_hermano(C,B));(es_hermano(A,C),son_pareja(C,B)).
+es_suegro(A,B) :- progenitor(A,C),son_pareja(C,B).
+
+
+es_sangre_pura(A) :- sangre_pura(A),\+ familia_de_muggles(A).
+es_sangre_pura(A) :- \+ familia_de_muggles(A), (progenitor(B,A), es_sangre_pura(B)).
