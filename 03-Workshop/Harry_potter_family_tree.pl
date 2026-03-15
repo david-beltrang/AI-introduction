@@ -64,11 +64,12 @@ es_padre(septimus_weasley, arthur_weasley).
 
 % Hijos de Arthur Weasley
 es_padre(arthur_weasley, fred_weasley).
-es_padre(arthur_weasley, charles_weasley).
+es_padre(arthur_weasley, charlie_weasley).
 es_padre(arthur_weasley, percy_weasley).
 es_padre(arthur_weasley, william_weasley).
 es_padre(arthur_weasley, ronald_weasley).
 es_padre(arthur_weasley, ginny_weasley).
+
 
 % Hijos de William Weasley
 es_padre(william_weasley, victoire_weasley).
@@ -156,7 +157,7 @@ es_madre(cedrella_black, arthur_weasley).
 
 % Hijos de Molly Weasley
 es_madre(molly_weasley, fred_weasley).
-es_madre(molly_weasley, charles_weasley).
+es_madre(molly_weasley, charlie_weasley).
 es_madre(molly_weasley, percy_weasley).
 es_madre(molly_weasley, william_weasley).
 es_madre(molly_weasley, ronald_weasley).
