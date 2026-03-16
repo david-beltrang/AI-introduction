@@ -61,4 +61,17 @@ public class Checker {
         }
         return match.size() >= Main.MATCH ? match : null;
     }
+
+    // Devuelve el tipo del marcador ganador (0 para "X" y 1 para "O"), o -1 si no hay ganador
+    public static int getWinType(Marker[][] markers){
+        ArrayList<Marker> match = checkWin(markers);
+
+        // Si no hay ganador, devuelve -1
+        if(match == null){
+            return -1;
+        }
+
+        // Si hay ganador, devuelve el tipo del marcador ganador (0 para "X" y 1 para "O")
+        return match.get(0).getType();
+    }
 }

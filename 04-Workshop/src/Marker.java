@@ -27,6 +27,10 @@ public class Marker implements IGameObject{
         }
     }
 
+    public Marker(int type){
+        this.type = type % 2;
+    }
+
     // Actualiza el estado del marcador, manejando la animación de parpadeo si el marcador forma parte de una combinación ganadora
     @Override
     public void update(float deltaTime) {
