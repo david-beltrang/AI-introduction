@@ -46,6 +46,7 @@ public class Placement  implements IGameObject{
         graphicsRender.fillRect(x, y, width, height);
         graphicsRender.setColor(Color.white);
     }
+
     public void checkCollision(int x, int y){
         if(markerPlaced){
             return;
@@ -57,15 +58,19 @@ public class Placement  implements IGameObject{
             fadeIn = false;
         }
     }
+    
     public int getxIndex(){
         return xIndex;
     }
+
     public int getyIndex() {
         return yIndex;
     }
+
     public boolean isActive(){
         return fadeIn;
     }
+
     public void set(boolean isSet){
         markerPlaced = isSet;
         if(isSet){
