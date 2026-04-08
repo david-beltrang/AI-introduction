@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, scrolledtext, Button, Entry, Listbox, Label
+from inference import run_inference
+
 
 class LogicInferenceGUI:
     def __init__(self, root):
@@ -10,6 +12,7 @@ class LogicInferenceGUI:
         Label(root, text="Ingresa una cláusula en LPO:").pack(pady=5)
         self.clause_entry = Entry(root, width=50)
         self.clause_entry.pack(pady=5)
+        self.clause_entry.bind("<Return>", lambda e: self.add_clause())
 
         # Teclado virtual para LPO
         self.create_lpo_keyboard()
@@ -22,6 +25,11 @@ class LogicInferenceGUI:
         Label(root, text="Cláusulas ingresadas:").pack(pady=5)
         self.clauses_listbox = Listbox(root, width=50, height=10)
         self.clauses_listbox.pack(pady=5)
+
+        # Campo de consulta
+        Label(root, text="Consulta :").pack(pady=5)
+        self.query_entry = Entry(root, width=50)
+        self.query_entry.pack(pady=5)
 
         # Botón para ejecutar inferencia
         self.execute_button = Button(root, text="Ejecutar Inferencia", command=self.execute_inference)
@@ -52,11 +60,15 @@ class LogicInferenceGUI:
 
     def insert_symbol(self, symbol):
         """Inserta un símbolo de LPO en el campo de texto."""
-        self.clause_entry.insert(tk.END, symbol)
+        focused = self.root.focus_get()
+        if focused == self.query_entry:
+            self.query_entry.insert(tk.END, symbol)
+        else:
+            self.clause_entry.insert(tk.END, symbol)
 
     def add_clause(self):
         """Agrega la cláusula ingresada a la lista."""
-        clause = self.clause_entry.get()
+        clause = self.clause_entry.get().strip()
         if clause:
             self.clauses.append(clause)
             self.clauses_listbox.insert(tk.END, clause)
@@ -70,14 +82,33 @@ class LogicInferenceGUI:
             messagebox.showwarning("Advertencia", "No hay cláusulas para ejecutar.")
             return
 
-        # Aquí iría la lógica del motor de inferencia
         self.result_text.delete(1.0, tk.END)
-        self.result_text.insert(tk.END, "Ejecutando motor de inferencia con las siguientes cláusulas:\n")
-        for clause in self.clauses:
-            self.result_text.insert(tk.END, f"- {clause}\n")
 
-        # Ejemplo de resultado (simulado)
-        self.result_text.insert(tk.END, "\nResultado: La consulta es válida (ejemplo).")
+        query = self.query_entry.get().strip()
+        query = query if query else None
+
+        try:
+            result, steps = run_inference(self.clauses, query)
+
+            for step in steps:
+                self.result_text.insert(tk.END, step + "\n")
+
+            self.result_text.insert(tk.END, "\n" + "=" * 50 + "\n")
+            if query:
+                if result:
+                    self.result_text.insert(tk.END, f"RESULTADO: '{query}' es VERDADERO\n")
+                else:
+                    self.result_text.insert(tk.END, f"RESULTADO: '{query}' NO se puede demostrar\n")
+            else:
+                self.result_text.insert(tk.END, "Resolución completada.\n")
+
+        except Exception as e:
+            self.result_text.insert(tk.END, f"ERROR: {str(e)}\n")
+            import traceback
+            self.result_text.insert(tk.END, traceback.format_exc())
+
+        self.result_text.see(tk.END)
+
 
 if __name__ == "__main__":
     root = tk.Tk()
